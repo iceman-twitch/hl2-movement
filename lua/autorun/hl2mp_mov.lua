@@ -1,3 +1,5 @@
+
+
 -- Setup Movement style to Half-Life 2: Deathmatch ( OG VERSION )
 hl2mp_mov = hl2mp_mov or {}
 hl2mp_mov.SlowWalkSpeed		= 150		-- How fast to move when slow-walking (+WALK)
@@ -7,9 +9,9 @@ hl2mp_mov.CrouchedWalkSpeed	= 0.3335		-- Multiply move speed by this when crouch
 hl2mp_mov.DuckSpeed			= 0.3335		-- How fast to go from not ducking, to ducking
 hl2mp_mov.UnDuckSpeed			= 0.3335		-- How fast to go from ducking, to not ducking
 hl2mp_mov.JumpPower			= 200		-- How powerful our jump should be
+hl2mp_mov.author = "iceman_twitch"
 
-
-
+local workshopid = 2876378639
 
 CreateClientConVar( 'hl2mp_bhop_enable', '0', true, true )
 CreateClientConVar( 'hl2mp_mov_enable', '1', true, true )
@@ -28,10 +30,29 @@ function meta:HL2MP_SetIsJumping( val )
     self:SetNWBool( "HL2MP_IsJumping", val )
 	
 end
+function meta:HL2MP_GetIsNoClipping()
 
+    return self:GetNWBool( "HL2MP_IsNoClipping", false )
+	
+end
+
+function meta:HL2MP_SetIsNoClip( val )
+
+    self:SetNWBool( "HL2MP_IsNoClipping", val )
+	
+end
+if SERVER then
+    hook.Add( "PlayerNoClip", "hl2mp.PlayerNoClip", function( ply, desiredState )
+        if ( desiredState ) then -- wants to enter NoClip
+            ply:HL2MP_SetIsNoClip( true )
+        else
+            ply:HL2MP_SetIsNoClip( false )
+        end
+    end )
+end
 hook.Add( 'SetupMove', 'hl2mp.StartMove', function( ply, mv, cmd )
 
-    if bit.band(mv:GetButtons(), IN_JUMP) ~= 0 and bit.band(mv:GetOldButtons(), IN_JUMP) == 0 and ply:OnGround() then
+    if bit.band(mv:GetButtons(), IN_JUMP) ~= 0 and bit.band(mv:GetOldButtons(), IN_JUMP) == 0 and ( ply:OnGround() or ply:WaterLevel() == 3 or ply:WaterLevel() == 2 or ply:HL2MP_GetIsNoClipping() ) then
 
 		ply:HL2MP_SetIsJumping( true )
 
@@ -184,7 +205,8 @@ end)
 if SERVER then
 
     hook.Add('PlayerLoadout', 'hl2mp.setupspeed', function( ply)
-
+        ply:HL2MP_SetIsNoClip( false )
+        ply:HL2MP_SetIsJumping( false )
         if ply:GetInfo('hl2mp_mov_enable') == '1' then 
             GAMEMODE:SetPlayerSpeed( ply, hl2mp_mov.WalkSpeed, hl2mp_mov.RunSpeed )
             ply:SetSlowWalkSpeed( hl2mp_mov.SlowWalkSpeed )
