@@ -16,7 +16,7 @@ local workshopid = 2876378639
 local hl2_bhop_enable = CreateClientConVar( 'hl2_bhop_enable', '0', true, true )
 local hl2_mov_enable = CreateClientConVar( 'hl2_mov_enable', '1', true, true )
 local hl2_propclimb_enable = CreateClientConVar( 'hl2_propclimb_enable', '1', true, true )
-local hl2_auto_accelerate = CreateConVar( 'hl2_auto_accelerate', '0', true, true )
+local hl2_auto_accelerate = CreateConVar( 'hl2_auto_accelerate', '0', {FCVAR_NOTIFY}, 'HL2 Movement auto setup accelerate' )
 
 local meta = FindMetaTable('Player')
 
