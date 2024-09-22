@@ -13,9 +13,10 @@ hl2_mov.author = "iceman_twitch"
 
 local workshopid = 2876378639
 
-CreateClientConVar( 'hl2_bhop_enable', '0', true, true )
-CreateClientConVar( 'hl2_mov_enable', '1', true, true )
-CreateClientConVar( 'hl2_propclimb_enable', '1', true, true )
+local hl2_bhop_enable = CreateClientConVar( 'hl2_bhop_enable', '0', true, true )
+local hl2_mov_enable = CreateClientConVar( 'hl2_mov_enable', '1', true, true )
+local hl2_propclimb_enable = CreateClientConVar( 'hl2_propclimb_enable', '1', true, true )
+local hl2_auto_accelerate = CreateConVar( 'hl2_auto_accelerate', '0', true, true )
 
 local meta = FindMetaTable('Player')
 
@@ -215,10 +216,12 @@ if SERVER then
             ply:SetDuckSpeed( hl2_mov.DuckSpeed )
             ply:SetUnDuckSpeed( hl2_mov.UnDuckSpeed )
 
+            
+        end
+        if hl2_auto_accelerate:GetBool() then
             game.ConsoleCommand("sv_airaccelerate 99\n")
             game.ConsoleCommand("sv_accelerate 99\n")
         end
-
     end)
 
 end
