@@ -1,6 +1,4 @@
-
-
--- Setup Movement style to Half-Life 2: Deathmatch ( OG VERSION )
+-- Setup Movement style to Half-Life 2 ( OG VERSION )
 hl2_mov = hl2_mov or {}
 hl2_mov.SlowWalkSpeed		= 150		-- How fast to move when slow-walking (+WALK)
 hl2_mov.WalkSpeed			= 190		-- How fast to move when not running
@@ -10,6 +8,8 @@ hl2_mov.DuckSpeed			= 0.3335		-- How fast to go from not ducking, to ducking
 hl2_mov.UnDuckSpeed			= 0.3335		-- How fast to go from ducking, to not ducking
 hl2_mov.JumpPower			= 200		-- How powerful our jump should be
 hl2_mov.author = "iceman_twitch"
+hl2_mov.version = "0.71"
+hl2_mov.update = "2024-09-22-22:03"
 
 local workshopid = 2876378639
 
@@ -42,8 +42,24 @@ function meta:hl2_SetIsNoClip( val )
     self:SetNWBool( "hl2_IsNoClipping", val )
 	
 end
+
+local function hl2_mov_print( str )
+    local hl2_mov_tag = "[hl2_mov]: "
+    local str = str
+    print( hl2_mov_tag .. str )
+end
+
+hook.Add( "Initialize", "hl2_mov.Initialize", function()
+    
+	hl2_mov_print( "Initialized" )
+    hl2_mov_print( "Build Version - " .. hl2_mov.version )
+    hl2_mov_print( "Build Update - " .. hl2_mov.update )
+    hl2_mov_print( "Author - " .. hl2_mov.author )
+
+end )
+
 if SERVER then
-    hook.Add( "PlayerNoClip", "hl2mp.PlayerNoClip", function( ply, desiredState )
+    hook.Add( "PlayerNoClip", "hl2_mov.PlayerNoClip", function( ply, desiredState )
         if ( desiredState ) then -- wants to enter NoClip
             ply:hl2_SetIsNoClip( true )
         else
@@ -51,7 +67,7 @@ if SERVER then
         end
     end )
 end
-hook.Add( 'SetupMove', 'hl2mp.StartMove', function( ply, mv, cmd )
+hook.Add( 'SetupMove', 'hl2_mov.StartMove', function( ply, mv, cmd )
 
     if bit.band(mv:GetButtons(), IN_JUMP) ~= 0 and bit.band(mv:GetOldButtons(), IN_JUMP) == 0 and ( ply:OnGround() or ply:WaterLevel() == 3 or ply:WaterLevel() == 2 or ply:hl2_GetIsNoClipping() ) then
 
@@ -83,7 +99,7 @@ local props = {
 	
 }
 
-hook.Add( 'Move', 'hl2mp.Move', function( ply, mv )
+hook.Add( 'Move', 'hl2_mov.Move', function( ply, mv )
 
     if ply:GetInfo('hl2_propclimb_enable') == '1' then
 
@@ -148,7 +164,7 @@ hook.Add( 'Move', 'hl2mp.Move', function( ply, mv )
 
 end)
 
-hook.Add( 'FinishMove', 'hl2mp.StartMove', function( ply, mv, cmd )
+hook.Add( 'FinishMove', 'hl2_mov.StartMove', function( ply, mv, cmd )
     if ply:GetInfo('hl2_mov_enable') == '1' then
         if ply:hl2_GetIsJumping() then
             local currentSpeed = mv:GetVelocity():Length2D()
@@ -205,7 +221,7 @@ end)
 
 if SERVER then
 
-    hook.Add('PlayerLoadout', 'hl2mp.setupspeed', function( ply)
+    hook.Add('PlayerLoadout', 'hl2_mov.setupspeed', function( ply)
         ply:hl2_SetIsNoClip( false )
         ply:hl2_SetIsJumping( false )
         if ply:GetInfo('hl2_mov_enable') == '1' then 
