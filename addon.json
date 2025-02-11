@@ -1,0 +1,30 @@
+{
+	"title" : "Half-Life 2: Movement",
+	"type" : "Tool",
+	"tags" : [ "fun", "roleplay" ],
+	"ignore" :
+	[
+		".git/*",
+		".gitignore",
+		".gitignore*",
+		".gitattributes",
+		".gitattributes*",
+		".git*",
+		"*.md",
+		"*.xlsx",
+		"*.xls",
+		"*.bat",
+		"*.zip",
+		"*.old",
+		"*.old2",
+		"*.7z",
+		"*.gma",
+		"*.ogm",
+		"*.psd",
+		"*.bz2",
+		"pic.jpg",
+		"readme.txt",
+		"changelog.txt",
+		"info.txt"
+	]
+}
