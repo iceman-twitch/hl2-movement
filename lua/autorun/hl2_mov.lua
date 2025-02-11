@@ -71,8 +71,42 @@ if SERVER then
         end
     end )
 end
+
+local function TFA_MOVE(self, movedata)
+	local weapon = self:GetActiveWeapon()
+
+	if IsValid(weapon) and weapon.IsTFAWeapon then
+		weapon:TFAMove(self, movedata)
+	end
+end
+local function TFA_FINISHMOVE(plyv)
+	if SERVER and not game.SinglePlayer() then
+		local wepv = plyv:GetActiveWeapon()
+	
+		if IsValid(wepv) and wepv.IsTFAWeapon and wepv.PlayerThink then
+			wepv:PlayerThink(plyv, not IsFirstTimePredicted())
+		end
+	end
+
+	if CLIENT then
+		if IsFirstTimePredicted() then
+			TFA.Ballistics.Bullets:Update(plyv)
+		end
+	end
+end
+local function TFA_SETUPMOVE(plyv, movedata, commanddata)
+	local wepv = plyv:GetActiveWeapon()
+
+	if IsValid(wepv) and wepv.IsTFAWeapon then
+		local speedmult = Lerp(wepv:GetIronSightsProgress(), sv_tfa_weapon_weight:GetBool() and wepv:GetStatL("RegularMoveSpeedMultiplier", 1), wepv:GetStatL("AimingDownSightsSpeedMultiplier", 1))
+		movedata:SetMaxClientSpeed(movedata:GetMaxClientSpeed() * speedmult)
+		commanddata:SetForwardMove(commanddata:GetForwardMove() * speedmult)
+		commanddata:SetSideMove(commanddata:GetSideMove() * speedmult)
+	end
+end
 hook.Add( 'SetupMove', 'hl2_mov.StartMove', function( ply, mv, cmd )
 
+	if TFA then TFA_SETUPMOVE(ply, mv, cmd) end
     if bit.band(mv:GetButtons(), IN_JUMP) ~= 0 and bit.band(mv:GetOldButtons(), IN_JUMP) == 0 and ( ply:OnGround() or ply:WaterLevel() == 3 or ply:WaterLevel() == 2 or ply:hl2_GetIsNoClipping() ) then
 
 		ply:hl2_SetIsJumping( true )
@@ -104,7 +138,7 @@ local props = {
 }
 
 hook.Add( 'Move', 'hl2_mov.Move', function( ply, mv )
-
+	if TFA then TFA_MOVE(plyv, mv) end
     if ply:GetInfo('hl2_propclimb_enable') == '1' then
 
         if ( drive.Move( ply, mv ) ) then return true end
@@ -169,6 +203,7 @@ hook.Add( 'Move', 'hl2_mov.Move', function( ply, mv )
 end)
 
 hook.Add( 'FinishMove', 'hl2_mov.StartMove', function( ply, mv, cmd )
+	if TFA then TFA_FINISHMOVE(ply) end
     if ply:GetInfo('hl2_mov_enable') == '1' then
         if ply:hl2_GetIsJumping() then
             local currentSpeed = mv:GetVelocity():Length2D()
