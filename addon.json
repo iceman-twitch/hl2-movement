@@ -25,6 +25,7 @@
 		"pic.jpg",
 		"readme.txt",
 		"changelog.txt",
-		"info.txt"
+		"info.txt",
+        "LICENSE"
 	]
 }
