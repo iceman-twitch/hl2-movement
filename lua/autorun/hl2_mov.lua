@@ -8,8 +8,10 @@ hl2_mov.DuckSpeed			= 0.3333		-- How fast to go from not ducking, to ducking
 hl2_mov.UnDuckSpeed			= 0.3333		-- How fast to go from ducking, to not ducking
 hl2_mov.JumpPower			= 200		-- How powerful our jump should be
 hl2_mov.author = "iceman_twitch"
-hl2_mov.version = "0.71"
-hl2_mov.update = "2024-09-22-22:03"
+hl2_mov.email = "iceman.twitch.contact@gmail.com"
+hl2_mov.website = "linktr.ee/iceman_twitch"
+hl2_mov.version = "0.72"
+hl2_mov.update = "2025-02-11-12:24"
 
 local workshopid = 2876378639
 
@@ -51,10 +53,12 @@ end
 
 hook.Add( "Initialize", "hl2_mov.Initialize", function()
     
-	hl2_mov_print( "Initialized" )
-    hl2_mov_print( "Build Version - " .. hl2_mov.version )
-    hl2_mov_print( "Build Update - " .. hl2_mov.update )
-    hl2_mov_print( "Author - " .. hl2_mov.author )
+	hl2_mov_print( "[hl2-movement]: Initialized" )
+    hl2_mov_print( "[hl2-movement]: Build Version - " .. hl2_mov.version )
+    hl2_mov_print( "[hl2-movement]: Build Update - " .. hl2_mov.update )
+    hl2_mov_print( "[hl2-movement]: Author - " .. hl2_mov.author )
+	hl2_mov_print( "[hl2-movement]: Email - " .. hl2_mov.email )
+	hl2_mov_print( "[hl2-movement]: Website - " .. hl2_mov.website )
 
 end )
 
