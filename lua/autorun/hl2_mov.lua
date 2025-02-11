@@ -18,7 +18,8 @@ local workshopid = 2876378639
 local hl2_bhop_enable = CreateClientConVar( 'hl2_bhop_enable', '0', true, true )
 local hl2_mov_enable = CreateClientConVar( 'hl2_mov_enable', '1', true, true )
 local hl2_propclimb_enable = CreateClientConVar( 'hl2_propclimb_enable', '1', true, true )
-local hl2_auto_accelerate = CreateConVar( 'hl2_auto_accelerate', '0', {FCVAR_NOTIFY}, 'HL2 Movement auto setup accelerate' )
+local hl2_auto_accelerate = CreateConVar( 'hl2_auto_accelerate', '0', {FCVAR_NOTIFY}, 'HL2 Movement Auto Setup Accelerate' )
+local hl2_backward_jumping = CreateConVar( 'hl2_backward_jumping', '0', {FCVAR_NOTIFY}, 'HL2 Movement Backward Jumping' )
 
 local meta = FindMetaTable('Player')
 
@@ -99,7 +100,7 @@ local function TFA_SETUPMOVE(plyv, movedata, commanddata)
 	local wepv = plyv:GetActiveWeapon()
 
 	if IsValid(wepv) and wepv.IsTFAWeapon then
-		local speedmult = Lerp(wepv:GetIronSightsProgress(), sv_tfa_weapon_weight:GetBool() and wepv:GetStatL("RegularMoveSpeedMultiplier", 1), wepv:GetStatL("AimingDownSightsSpeedMultiplier", 1))
+		local speedmult = Lerp(wepv:GetIronSightsProgress(), GetConVar("sv_tfa_weapon_weight"):GetBool() and wepv:GetStatL("RegularMoveSpeedMultiplier", 1), wepv:GetStatL("AimingDownSightsSpeedMultiplier", 1))
 		movedata:SetMaxClientSpeed(movedata:GetMaxClientSpeed() * speedmult)
 		commanddata:SetForwardMove(commanddata:GetForwardMove() * speedmult)
 		commanddata:SetSideMove(commanddata:GetSideMove() * speedmult)
@@ -139,7 +140,7 @@ local props = {
 }
 
 hook.Add( 'Move', 'hl2_mov.Move', function( ply, mv )
-	if TFA then TFA_MOVE(plyv, mv) end
+	if TFA then TFA_MOVE(ply, mv) end
     if ply:GetInfo('hl2_propclimb_enable') == '1' then
 
         if ( drive.Move( ply, mv ) ) then return true end
@@ -242,9 +243,11 @@ hook.Add( 'FinishMove', 'hl2_mov.StartMove', function( ply, mv, cmd )
             local newSpeed = speedAddition --+ ( mv:GetVelocity():Length2D() / 8 )
 
             if mv:GetVelocity():Dot( forward ) < 0 then
-            
-                newSpeed = -newSpeed
-                
+                if hl2_backward_jumping:GetBool() then 
+                    newSpeed = -( newSpeed * 2 )
+                else
+                    newSpeed = -newSpeed
+                end
             end
 
             -- Apply the speed boost
@@ -271,8 +274,6 @@ if SERVER then
             ply:SetCrouchedWalkSpeed( hl2_mov.CrouchedWalkSpeed )
             ply:SetDuckSpeed( hl2_mov.DuckSpeed )
             ply:SetUnDuckSpeed( hl2_mov.UnDuckSpeed )
-
-            
         end
         if hl2_auto_accelerate:GetBool() then
             game.ConsoleCommand("sv_airaccelerate 99\n")
