@@ -72,6 +72,7 @@ if SERVER then
     end )
 end
 
+-- TFA Compatibility Fix
 local function TFA_MOVE(self, movedata)
 	local weapon = self:GetActiveWeapon()
 
