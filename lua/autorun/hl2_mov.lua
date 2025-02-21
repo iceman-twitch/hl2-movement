@@ -152,7 +152,8 @@ local props = {
 
     ["prop_physics"] = true,
     ["prop_physics_respawnable"] = true,
-    ["func_physbox"] = true
+    ["func_physbox"] = true,
+    ["func_pushable"] = true,
 	
 }
 
@@ -293,8 +294,9 @@ if SERVER then
             ply:SetUnDuckSpeed( hl2_mov.UnDuckSpeed )
         end
         if hl2_auto_accelerate:GetBool() then
-            game.ConsoleCommand("sv_airaccelerate 99\n")
-            game.ConsoleCommand("sv_accelerate 99\n")
+            game.ConsoleCommand("sv_wateraccelerate 999\n")
+            game.ConsoleCommand("sv_airaccelerate 999\n")
+            game.ConsoleCommand("sv_accelerate 999\n")
         end
     end)
 
