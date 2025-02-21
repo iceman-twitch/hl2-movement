@@ -1,4 +1,17 @@
 -- Setup Movement style to Half-Life 2 ( OG VERSION )
+
+-- hl1 data
+-- running = 320
+-- walking = 100
+-- crouching = 106,67
+-- crouching walking = 5
+-- running jump can reach almost 400
+-- walking jump can reach 200
+-- crouching jump can reach 250 maybe
+-- crouching walking jump can reach somehow 200
+-- fast speeding from standing to 320
+-- stopping from run slowly slow down to 0 from 320
+
 hl2_mov = hl2_mov or {}
 hl2_mov.SlowWalkSpeed		= 150		-- How fast to move when slow-walking (+WALK)
 hl2_mov.WalkSpeed			= 190		-- How fast to move when not running
