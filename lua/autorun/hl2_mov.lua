@@ -14,8 +14,11 @@
 
 hl2_mov = hl2_mov or {}
 hl2_mov.SlowWalkSpeed		= 150		-- How fast to move when slow-walking (+WALK)
+hl2_mov.SlowWalkSpeed_hl1		= 100		-- How fast to move when slow-walking (+WALK)
 hl2_mov.WalkSpeed			= 190		-- How fast to move when not running
+hl2_mov.WalkSpeed_hl1			= 320		-- How fast to move when not running
 hl2_mov.RunSpeed				= 320		-- How fast to move when running
+hl2_mov.RunSpeed_hl1				= 100		-- How fast to move when running
 hl2_mov.CrouchedWalkSpeed	= 0.3333		-- Multiply move speed by this when crouching
 hl2_mov.DuckSpeed			= 0.3333		-- How fast to go from not ducking, to ducking
 hl2_mov.UnDuckSpeed			= 0.3333		-- How fast to go from ducking, to not ducking
@@ -23,11 +26,12 @@ hl2_mov.JumpPower			= 200		-- How powerful our jump should be
 hl2_mov.author = "iceman_twitch"
 hl2_mov.email = "iceman.twitch.contact@gmail.com"
 hl2_mov.website = "linktr.ee/iceman_twitch"
-hl2_mov.version = "0.72"
-hl2_mov.update = "2025-02-11-12:24"
+hl2_mov.version = "0.73"
+hl2_mov.update = "2025-02-21-17:49"
 
 local workshopid = 2876378639
 
+local hl2_mov_mode = CreateClientConVar( 'hl2_mov_mode', '1', {FCVAR_NOTIFY}, 'HL2 Movement Mode HL 2: 1 / HL1 : 0'  )
 local hl2_bhop_enable = CreateClientConVar( 'hl2_bhop_enable', '0', true, true )
 local hl2_mov_enable = CreateClientConVar( 'hl2_mov_enable', '1', true, true )
 local hl2_propclimb_enable = CreateClientConVar( 'hl2_propclimb_enable', '1', true, true )
