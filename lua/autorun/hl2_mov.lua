@@ -31,7 +31,7 @@ hl2_mov.author = "iceman_twitch"
 hl2_mov.email = "iceman.twitch.contact@gmail.com"
 hl2_mov.website = "linktr.ee/iceman_twitch"
 hl2_mov.version = "0.77"
-hl2_mov.update = "2025-02-22-13:07"
+hl2_mov.update = "2025-02-22-15:11"
 
 local workshopid = 2876378639
 
