@@ -20,14 +20,18 @@ hl2_mov.WalkSpeed_hl1			= 320		-- How fast to move when not running
 hl2_mov.RunSpeed				= 320		-- How fast to move when running
 hl2_mov.RunSpeed_hl1				= 100		-- How fast to move when running
 hl2_mov.CrouchedWalkSpeed	= 0.3333		-- Multiply move speed by this when crouching
+hl2_mov.CrouchedWalkSpeed_hl1	= 0.1		-- Multiply move speed by this when crouching
+
 hl2_mov.DuckSpeed			= 0.3333		-- How fast to go from not ducking, to ducking
+hl2_mov.DuckSpeed_hl1			= 0.4		-- How fast to go from not ducking, to ducking
 hl2_mov.UnDuckSpeed			= 0.3333		-- How fast to go from ducking, to not ducking
+hl2_mov.UnDuckSpeed_hl1			= 0.15		-- How fast to go from ducking, to not ducking
 hl2_mov.JumpPower			= 200		-- How powerful our jump should be
 hl2_mov.author = "iceman_twitch"
 hl2_mov.email = "iceman.twitch.contact@gmail.com"
 hl2_mov.website = "linktr.ee/iceman_twitch"
-hl2_mov.version = "0.73"
-hl2_mov.update = "2025-02-21-17:49"
+hl2_mov.version = "0.77"
+hl2_mov.update = "2025-02-22-13:07"
 
 local workshopid = 2876378639
 
@@ -123,9 +127,47 @@ local function TFA_SETUPMOVE(plyv, movedata, commanddata)
 		commanddata:SetSideMove(commanddata:GetSideMove() * speedmult)
 	end
 end
+
+local function DoCrouchTrace(origin, endpos)
+	endpos = endpos or Vector()
+	local plyTable = player.GetAll()
+	local tr = util.TraceHull({
+		start = origin,
+		endpos = origin + endpos,
+		filter = plyTable,
+		mask = MASK_PLAYERSOLID,
+		mins = Vector(-16, -16, 0),
+		maxs = Vector(16, 16, 72)
+	})
+	return tr
+end
 hook.Add( 'SetupMove', 'hl2_mov.StartMove', function( ply, mv, cmd )
 
 	if TFA then TFA_SETUPMOVE(ply, mv, cmd) end
+    if ply:GetInfo('hl2_mov_mode') == '0' and ply:Alive() and cmd:KeyDown(IN_DUCK) and cmd:KeyDown(IN_WALK) and ply:GetCrouchedWalkSpeed() > 0.05 then
+        ply:SetCrouchedWalkSpeed(0.08)
+    end
+    if ply:GetInfo('hl2_mov_mode') == '0' and ply:Alive() and cmd:KeyDown(IN_DUCK) and !cmd:KeyDown(IN_WALK) and ply:GetCrouchedWalkSpeed() < 0.3 then 
+        ply:SetCrouchedWalkSpeed(0.33333)
+    end
+    if ply:GetInfo('hl2_mov_mode') == '0' and ply:Alive() and ply:GetMoveType() == MOVETYPE_WALK and !ply:OnGround() and ply:WaterLevel() < 1 then
+		local tr = DoCrouchTrace(mv:GetOrigin())
+		if !tr.Hit then
+			local crouchOffset = Vector(0,0,16)
+			if !ply:Crouching() and cmd:KeyDown(IN_DUCK) then
+				tr = DoCrouchTrace(mv:GetOrigin(), -crouchOffset)
+				mv:SetOrigin(tr.HitPos)
+				if tr.Hit then
+					mv:SetOrigin(mv:GetOrigin() - crouchOffset)
+				end
+			end
+			if ply:Crouching() and mv:KeyReleased(IN_DUCK) then
+				tr = DoCrouchTrace(mv:GetOrigin(), crouchOffset)
+				mv:SetOrigin(tr.HitPos)
+			end
+		end
+	end
+    
     if bit.band(mv:GetButtons(), IN_JUMP) ~= 0 and bit.band(mv:GetOldButtons(), IN_JUMP) == 0 and ( ply:OnGround() or ply:WaterLevel() == 3 or ply:WaterLevel() == 2 or ply:hl2_GetIsNoClipping() ) then
 
 		ply:hl2_SetIsJumping( true )
@@ -243,7 +285,7 @@ hook.Add( 'FinishMove', 'hl2_mov.StartMove', function( ply, mv, cmd )
                     if currentSpeed > 410 then
                         speedBoostPerc = 0.12
                     end
-                elseif ply:IsSprinting() and ply:Crouching() then
+                elseif ply:IsSprinting() and ply:Crouching() and ply:GetInfo('hl2_mov_mode') == '1' then
                     speedBoostPerc = 0.2
                     if currentSpeed > 410 then
                         speedBoostPerc = 0.12
@@ -286,12 +328,25 @@ if SERVER then
         ply:hl2_SetIsNoClip( false )
         ply:hl2_SetIsJumping( false )
         if ply:GetInfo('hl2_mov_enable') == '1' then 
-            GAMEMODE:SetPlayerSpeed( ply, hl2_mov.WalkSpeed, hl2_mov.RunSpeed )
-            ply:SetSlowWalkSpeed( hl2_mov.SlowWalkSpeed )
-            ply:SetJumpPower( hl2_mov.JumpPower )
-            ply:SetCrouchedWalkSpeed( hl2_mov.CrouchedWalkSpeed )
-            ply:SetDuckSpeed( hl2_mov.DuckSpeed )
-            ply:SetUnDuckSpeed( hl2_mov.UnDuckSpeed )
+            if ply:GetInfo('hl2_mov_mode') == '0' then
+                local gravity = GetConVarNumber("sv_gravity")
+                local jumppower = math.sqrt(2 * gravity * 45.0)
+                GAMEMODE:SetPlayerSpeed( ply, 320, 320 )
+                ply:SetWalkSpeed( 320 )
+                ply:SetRunSpeed( 320 )
+                ply:SetSlowWalkSpeed( 100 )
+                ply:SetJumpPower( jumppower )
+                ply:SetCrouchedWalkSpeed( 0.33333 )
+                ply:SetDuckSpeed( 0.33333 )
+                ply:SetUnDuckSpeed( 0.33333 )
+            else
+                GAMEMODE:SetPlayerSpeed( ply, hl2_mov.WalkSpeed, hl2_mov.RunSpeed )
+                ply:SetSlowWalkSpeed( hl2_mov.SlowWalkSpeed )
+                ply:SetJumpPower( hl2_mov.JumpPower )
+                ply:SetCrouchedWalkSpeed( hl2_mov.CrouchedWalkSpeed )
+                ply:SetDuckSpeed( hl2_mov.DuckSpeed )
+                ply:SetUnDuckSpeed( hl2_mov.UnDuckSpeed )
+            end
         end
         if hl2_auto_accelerate:GetBool() then
             game.ConsoleCommand("sv_wateraccelerate 999\n")
@@ -299,5 +354,13 @@ if SERVER then
             game.ConsoleCommand("sv_accelerate 999\n")
         end
     end)
-
+else
+    hook.Add("CreateMove", "hl2_mov.CreateMove", function(cmd)
+        if LocalPlayer():GetInfo('hl2_mov_mode') == '0' then
+            if cmd:KeyDown(IN_SPEED) then
+                cmd:RemoveKey(IN_SPEED)
+                cmd:AddKey(IN_WALK)
+            end
+        end
+    end)
 end
